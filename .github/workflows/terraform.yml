@@ -86,4 +86,35 @@ jobs:
         env:
           AWS_REGION: us-east-1 # Still good to set region consistently
 
-      # ... rest of your workflow (fmt, validate, plan, apply) ...
+      - name: Terraform Format Check
+        id: fmt
+        run: terraform fmt -check
+        continue-on-error: true # Allow subsequent steps to run even if format fails
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+
+      - name: Terraform Plan
+        id: plan
+        # Only run plan on pull requests OR if explicitly triggered via workflow_dispatch
+        # This provides a preview of changes before merging to main, or for manual checks.
+        if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+        run: terraform plan -no-color -input=false
+        # `-input=false` prevents Terraform from prompting for input variables.
+
+      - name: Terraform Apply
+        id: apply
+        # Only apply on push to the 'main' branch.
+        # This is the "deployment" step. Use with caution for production environments.
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: terraform apply -auto-approve -input=false
+        # `-auto-approve` automatically applies the plan.
+        # For production, consider using manual approval via GitHub Environments or separate jobs.
+
+      # Optional: Add a step to destroy resources (e.g., for a 'destroy' branch or manual trigger)
+      # - name: Terraform Destroy
+      #   if: github.event_name == 'workflow_dispatch' && github.event.inputs.destroy == 'true'
+      #   run: terraform destroy -auto-approve
+      #   env:
+      #     AWS_REGION: ${{ env.AWS_REGION }}
