@@ -10,7 +10,7 @@ terraform {
     # Uncomment and configure the backend block below if you want to use S3 for state management.
     backend "s3" {
     bucket         = "udbhas-terraform-state-20250607"
-    key            = "${var.project_name}/terraform.tfstate"
+    key            = "MULTIVENDOR-PROJECT/terraform.tfstate"
     region         = "us-east-1"
     dynamodb_table = "UDBHAS-TERRAFORM-STATE-LOCK"
     }
