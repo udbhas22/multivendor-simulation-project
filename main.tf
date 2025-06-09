@@ -37,7 +37,7 @@ resource "aws_vpc" "my_vpc" {
 
 resource "aws_subnet" "all_subnets" {
   for_each          = var.subnet_configs
-  vpc_id            = aws_vpc.main.id
+  vpc_id            = aws_vpc.my_vpc.id
   cidr_block        = each.value.cidr_block
   availability_zone = var.availability_zone
   map_public_ip_on_launch = each.value.auto_assign_public_ip
