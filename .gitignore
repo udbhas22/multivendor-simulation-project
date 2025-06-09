@@ -1,0 +1,11 @@
+# Terraform generated files
+.terraform/           # Terraform's working directory, includes downloaded providers and modules.
+*.tfplan              # Terraform plan files (binary output).
+*.tfstate             # Local Terraform state file (if it somehow gets created despite S3 backend).
+*.tfstate.backup      # Backup of local Terraform state.
+.terraform.lock.hcl   # Terraform dependency lock file - keep this if you want consistent provider/module versions across environments/team.
+# If you ARE NOT using consistent versions and want new ones each time, uncomment the line below.
+# .terraform.lock.hcl
+
+# Crash log files
+crash.log
