@@ -18,7 +18,7 @@ terraform {
 
 provider "aws" {
   region = var.region
-  profile = "UDPERSONAL"
+  #profile = "UDPERSONAL"
 }
 
 #crating VPC
