@@ -28,8 +28,7 @@ resource "aws_vpc" "my_vpc" {
   enable_dns_support = true
   enable_dns_hostnames = true
   tags = merge(var.common_tags, {
-    Name = var.vpc_name # The subnet's specific name
-    # You could add other subnet-specific tags here if needed
+    Name = var.vpc_name 
   })
     
   } 
@@ -43,6 +42,7 @@ resource "aws_subnet" "all_subnets" {
   map_public_ip_on_launch = each.value.auto_assign_public_ip
   tags = merge(var.common_tags, {
     Name = each.key # The subnet's specific name
-    # You could add other subnet-specific tags here if needed
+    Vendor = each.value.vendor
+    
   })
 }

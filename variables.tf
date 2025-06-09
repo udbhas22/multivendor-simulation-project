@@ -10,6 +10,7 @@ variable "common_tags" {
   default = {
     Project = "MULTIVENDOR-PROJECT"
     Name   = "LAB"
+    Vendor = "ALL"
   }
 }
 
@@ -37,27 +38,33 @@ variable "subnet_configs" {
   type = map(object({
     cidr_block             = string
     auto_assign_public_ip = bool
+    vendor = string
   }))
   default = {
     "PUBLIC-SUBNET" = {
       cidr_block             = "172.16.5.0/24"
       auto_assign_public_ip = false # Overridden by elastic IP for target server
+      vendor = "ALL"
     },
     "MANAGEMENT-SUBNET" = {
-      cidr_block             = "172.16.6.0/24"
-      auto_assign_public_ip = false
-    },
-    "VENDOR1-SUBNET" = {
-      cidr_block             = "172.16.100.0/24"
-      auto_assign_public_ip = false
-    },
-    "VENDOR2-SUBNET" = {
       cidr_block             = "172.16.10.0/24"
       auto_assign_public_ip = false
+      vendor = "ALL"
+    },
+    "VENDOR1-SUBNET" = {
+      cidr_block             = "172.16.101.0/24"
+      auto_assign_public_ip = false
+      vendor = "VENDOR1"
+    },
+    "VENDOR2-SUBNET" = {
+      cidr_block             = "172.16.102.0/24"
+      auto_assign_public_ip = false
+      vendor = "VENDOR2"
     },
     "VENDOR3-SUBNET" = {
-      cidr_block             = "172.16.1.0/24"
-      auto_assign_public_ip = true # One subnet had this set to Yes
+      cidr_block             = "172.16.103.0/24"
+      auto_assign_public_ip = false # One subnet had this set to Yes
+      vendor = "VENDOR3"
     }
   }
 }
