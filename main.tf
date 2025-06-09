@@ -12,7 +12,7 @@ terraform {
     bucket         = "udbhas-terraform-state-20250607"
     key            = "MULTIVENDOR-PROJECT/terraform.tfstate"
     region         = "us-east-1"
-    dynamodb_table = "UDBHAS-TERRAFORM-STATE-LOCK"
+    use_lockfile = true
     }
 }
 
