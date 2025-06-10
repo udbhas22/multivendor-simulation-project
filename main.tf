@@ -69,21 +69,21 @@ resource "aws_security_group" "instance_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0/0"] # Allow SSH from anywhere,
+    cidr_blocks = ["0.0.0.0/0"] # Allow SSH from anywhere,
   }
 
   ingress {
     from_port   = 3389
     to_port     = 3389
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0/0"] # Allow RDP from anywhere,
+    cidr_blocks = ["0.0.0.0/0"] # Allow RDP from anywhere,
   }
 
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1" # Allow all outbound traffic
-    cidr_blocks = ["0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"]
   } 
 
   tags = merge(var.common_tags, {
