@@ -42,7 +42,52 @@ resource "aws_subnet" "all_subnets" {
   map_public_ip_on_launch = each.value.auto_assign_public_ip
   tags = merge(var.common_tags, {
     Name = each.key # The subnet's specific name
-    Vendor = each.value.vendor
+    Vendor = each.value.vendor #gets the vendor name from the name defined in the variable object vendor
     
   })
 }
+
+#Creating elastic network interface from variable
+resource "aws_network_interface" "multi_interfaces" {
+  for_each           = var.network_interface_configs
+  subnet_id          = aws_subnet.network_subnets[each.value.subnet_key].id
+  private_ip         = cidrhost(aws_subnet.network_subnets[each.value.subnet_key].cidr_block, each.value.private_ip_suffix)
+  security_groups    = [aws_security_group.instance_sg.id]
+  source_dest_check  = false # Often disabled for multi-homed instances like firewalls
+
+  tags = {
+    Name = each.key
+  }
+}
+#Creating security group
+resource "aws_security_group" "instance_sg" {
+  name        = "MULTIVENDOR-INSTANCE-SG"
+  description = "Security group for instances in the MULTIVENDOR project"
+  vpc_id      = aws_vpc.my_vpc.id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0/0"] # Allow SSH from anywhere,
+  }
+
+  ingress {
+    from_port   = 3389
+    to_port     = 3389
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0/0"] # Allow RDP from anywhere,
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1" # Allow all outbound traffic
+    cidr_blocks = ["0.0.0/0"]
+  } 
+
+  tags = merge(var.common_tags, {
+    Name = "MULTIVENDOR-INSTANCE-SG"
+  })
+}
+

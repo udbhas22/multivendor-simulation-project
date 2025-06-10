@@ -68,3 +68,75 @@ variable "subnet_configs" {
     }
   }
 }
+
+#Network Interface Variables
+variable "network_interface_configs" {
+  description = "A map of network interface configurations including subnet and private IP."
+  type = map(object({
+    subnet_key = string
+    private_ip_suffix = number
+    is_primary = bool
+  }))
+  default = {
+    "VENDOR1-VICTIM-WIN-PRIMARY-ENI" = {
+      subnet_key = "VENDOR1-SUBNET"
+      private_ip_suffix = 10
+      is_primary = true
+    },
+    "VENDOR1-VICTIM-WIN-MGMT-ENI" = {
+      subnet_key = "MANAGEMENT-SUBNET"
+      private_ip_suffix = 10
+      is_primary = false
+    },
+    "VENDOR1-VICTIM-UBUNTU-PRIMARY-ENI" = {
+      subnet_key = "VENDOR1-SUBNET"
+      private_ip_suffix = 11
+      is_primary = true
+    },
+    "VENDOR1-VICTIM-UBUNTU-MGMT-ENI" = {
+      subnet_key = "MANAGEMENT-SUBNET"
+      private_ip_suffix = 11
+      is_primary = false
+    },
+    "VENDOR2-VICTIM-WIN-PRIMARY-ENI" = {
+      subnet_key = "VENDOR2-SUBNET"
+      private_ip_suffix = 10
+      is_primary = true
+    },
+    "VENDOR2-VICTIM-WIN-MGMT-ENI" = {
+      subnet_key = "MANAGEMENT-SUBNET"
+      private_ip_suffix = 12
+      is_primary = false
+    },
+     "VENDOR2-VICTIM-UBUNTU-PRIMARY-ENI" = {
+      subnet_key = "VENDOR2-SUBNET"
+      private_ip_suffix = 11
+      is_primary = true
+    },
+    "VENDOR2-VICTIM-UBUNTU-MGMT-ENI" = {
+      subnet_key = "MANAGEMENT-SUBNET"
+      private_ip_suffix = 13
+      is_primary = false
+    },
+    "VENDOR3-VICTIM-WIN-PRIMARY-ENI" = {
+      subnet_key = "VENDOR3-SUBNET"
+      private_ip_suffix = 10
+      is_primary = true
+    }
+    "VENDOR3-VICTIM-WIN-MGMT-ENI" = {
+      subnet_key = "MANAGEMENT-SUBNET"
+      private_ip_suffix = 14
+      is_primary = false
+    },
+   "VENDOR3-VICTIM-UBUNTU-PRIMARY-ENI" = {
+      subnet_key = "VENDOR3-SUBNET"
+      private_ip_suffix = 10
+      is_primary = true
+    },
+    "VENDOR3-VICTIM-UBUNTU-MGMT-ENI" = {
+      subnet_key = "MANAGEMENT-SUBNET"
+      private_ip_suffix = 15
+      is_primary = false
+    }
+  }
+}
