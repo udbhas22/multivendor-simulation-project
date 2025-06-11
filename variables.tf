@@ -76,7 +76,7 @@ variable "network_interface_configs" {
     subnet_key        = string
     private_ip_suffix = number
     is_primary        = bool
-    vendor             = string
+    vendor            = string
   }))
   default = {
     "VENDOR1-VICTIM-WIN-PRIMARY-ENI" = {

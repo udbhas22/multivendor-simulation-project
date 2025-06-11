@@ -49,15 +49,17 @@ resource "aws_subnet" "all_subnets" {
 
 #Creating elastic network interface from variable
 resource "aws_network_interface" "multi_interfaces" {
-  for_each           = var.network_interface_configs
-  subnet_id          = aws_subnet.all_subnets[each.value.subnet_key].id
-  private_ip         = cidrhost(aws_subnet.all_subnets[each.value.subnet_key].cidr_block, each.value.private_ip_suffix)
-  security_groups    = [aws_security_group.instance_sg.id]
-  source_dest_check  = false # Often disabled for multi-homed instances like firewalls
+  for_each          = var.network_interface_configs
+  subnet_id         = aws_subnet.all_subnets[each.value.subnet_key].id
+  private_ip        = cidrhost(aws_subnet.all_subnets[each.value.subnet_key].cidr_block, each.value.private_ip_suffix)
+  security_groups   = [aws_security_group.instance_sg.id]
+  source_dest_check = false # Often disabled for multi-homed instances like firewalls
 
-  tags = {
-    Name = each.key
-  }
+  tags = merge(var.common_tags, {
+    Name   = each.key          # The subnet's specific name
+    Vendor = each.value.vendor #gets the vendor name from the name defined in the variable object vendor
+
+  })
 }
 #Creating security group
 resource "aws_security_group" "instance_sg" {
