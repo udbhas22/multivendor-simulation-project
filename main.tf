@@ -96,7 +96,7 @@ resource "aws_security_group" "instance_sg" {
 # Creating an EC2 instance using the latest Ubuntu Jammy image
 data "aws_ami" "victim_ubuntu" {
   most_recent = true
-  owners      = ["amazon"] 
+  owners      = ["amazon"]
 
   filter {
     name   = "name"
@@ -135,13 +135,17 @@ data "aws_ami" "ubuntu_noble" {
     name   = "root-device-type"
     values = ["ebs"]
   }
+  filter {
+    name   = "architecture"
+    values = ["x86_64"] # This matches "Architecture"
+  }
 }
 # Instance creation for Ubuntu VMs with multiple ENIs
 resource "aws_instance" "ubuntu_victim_instances" {
   for_each      = var.instance_configs # Iterate over instance configurations
   ami           = data.aws_ami.ubuntu_noble.id
-  instance_type = each.value.instance_type 
-  key_name      = var.key_pair_name 
+  instance_type = each.value.instance_type
+  key_name      = var.key_pair_name
 
   # Attach network interfaces dynamically based on instance config
   dynamic "network_interface" {
