@@ -140,7 +140,8 @@ resource "aws_instance" "ubuntu_victim_instances" {
       # Use the 'is_primary' flag from the network_interface_configs variable
       # Device index 0 is always the primary, others follow.
       # If `is_primary` is true, it's device_index 0, otherwise it's 1, 2, ...
-      device_index = var.network_interface_configs[network_interface.value].is_primary ? 0 : index(each.value.network_interfaces_keys, network_interface.value) + 1
+      #device_index = var.network_interface_configs[network_interface.value].is_primary ? 0 : index(each.value.network_interfaces_keys, network_interface.value) + 1
+      device_index = var.network_interface_configs[network_interface.value].is_primary ? 0 : 1
     }
   }
   tags = merge(var.common_tags, {
