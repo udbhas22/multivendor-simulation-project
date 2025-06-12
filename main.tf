@@ -118,26 +118,11 @@ data "aws_ami" "victim_ubuntu" {
 
 # Creating an EC2 instance using the latest Ubuntu Noble (24.04 LTS) image
 data "aws_ami" "ubuntu_noble" {
-  most_recent = true
-  owners      = ["099720109477"] # Canonical's AWS account ID for official Ubuntu AMIs
-
+  owners      = ["099720109477"]
+  most_recent = false            
   filter {
-    name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-noble-24.04-amd64-server-*"] # Standard path for official 24.04 LTS
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-
-  filter {
-    name   = "root-device-type"
-    values = ["ebs"]
-  }
-  filter {
-    name   = "architecture"
-    values = ["x86_64"] # This matches "Architecture"
+    name   = "image-id"
+    values = ["ami-020cba7c55df1f615"] 
   }
 }
 # Instance creation for Ubuntu VMs with multiple ENIs
