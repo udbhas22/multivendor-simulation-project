@@ -153,3 +153,36 @@ variable "network_interface_configs" {
     }
   }
 }
+
+# New variable for your SSH Key Pair
+variable "key_pair_name" {
+  description = "The name of the EC2 Key Pair to allow SSH access."
+  type        = string
+  default     = "Key-projectLab" #Created manually in AWS console
+}
+# New variable for instance configurations
+variable "instance_configs" {
+  description = "A map of instance configurations including associated ENIs."
+  type = map(object({
+    instance_type           = string
+    vendor                  = string
+    network_interfaces_keys = list(string) # List of keys from var.network_interface_configs
+  }))
+  default = {
+    "VENDOR1-VICTIM-UBUNTU" = {
+      instance_type           = "t2.micro"
+      vendor                  = "VENDOR1"
+      network_interfaces_keys = ["VENDOR1-VICTIM-UBUNTU-PRIMARY-ENI", "VENDOR1-VICTIM-UBUNTU-MGMT-ENI"]
+    },
+    "VENDOR2-VICTIM-UBUNTU" = {
+      instance_type           = "t2.micro"
+      vendor                  = "VENDOR2"
+      network_interfaces_keys = ["VENDOR2-VICTIM-UBUNTU-PRIMARY-ENI", "VENDOR2-VICTIM-UBUNTU-MGMT-ENI"]
+    },
+    "VENDOR3-VICTIM-UBUNTU" = {
+      instance_type           = "t2.micro"
+      vendor                  = "VENDOR3"
+      network_interfaces_keys = ["VENDOR3-VICTIM-UBUNTU-PRIMARY-ENI", "VENDOR3-VICTIM-UBUNTU-MGMT-ENI"]
+    }
+  }
+}

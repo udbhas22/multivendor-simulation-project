@@ -93,3 +93,69 @@ resource "aws_security_group" "instance_sg" {
   })
 }
 
+# Creating an EC2 instance using the latest Ubuntu Jammy image
+data "aws_ami" "victim_ubuntu" {
+  most_recent = true
+  owners      = ["amazon"] 
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  filter {
+    name   = "root-device-type"
+    values = ["ebs"]
+  }
+}
+
+
+
+# Creating an EC2 instance using the latest Ubuntu Noble (24.04 LTS) image
+data "aws_ami" "ubuntu_noble" {
+  most_recent = true
+  owners      = ["099720109477"] # Canonical's AWS account ID for official Ubuntu AMIs
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-noble-24.04-amd64-server-*"] # Standard path for official 24.04 LTS
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  filter {
+    name   = "root-device-type"
+    values = ["ebs"]
+  }
+}
+# Instance creation for Ubuntu VMs with multiple ENIs
+resource "aws_instance" "ubuntu_victim_instances" {
+  for_each      = var.instance_configs # Iterate over instance configurations
+  ami           = data.aws_ami.ubuntu_noble.id
+  instance_type = each.value.instance_type 
+  key_name      = var.key_pair_name 
+
+  # Attach network interfaces dynamically based on instance config
+  dynamic "network_interface" {
+    for_each = each.value.network_interfaces_keys # Iterate through ENI keys for this instance
+    content {
+      network_interface_id = aws_network_interface.multi_interfaces[network_interface.value].id
+      # Use the 'is_primary' flag from the network_interface_configs variable
+      # Device index 0 is always the primary, others follow.
+      # If `is_primary` is true, it's device_index 0, otherwise it's 1, 2, ...
+      device_index = var.network_interface_configs[network_interface.value].is_primary ? 0 : index(each.value.network_interfaces_keys, network_interface.value) + 1
+    }
+  }
+  tags = merge(var.common_tags, {
+    Name   = each.key          # The instance's specific name
+    Vendor = each.value.vendor # gets the vendor name from the instance config
+  })
+}
