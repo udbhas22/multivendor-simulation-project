@@ -42,73 +42,73 @@
 #       with:
 #         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-name: 'Terraform'
+# name: 'Terraform'
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
+# on:
+#   push:
+#     branches: [ "main" ]
+#   pull_request:
 
-permissions:
-  contents: read
+# permissions:
+#   contents: read
 
-# .github/workflows/terraform-ci-cd.yml
+# # .github/workflows/terraform-ci-cd.yml
 
-# ... (previous parts of your workflow) ...
+# # ... (previous parts of your workflow) ...
 
-jobs:
-  terraform:
-    name: 'Terraform'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
+# jobs:
+#   terraform:
+#     name: 'Terraform'
+#     runs-on: ubuntu-latest
+#     permissions:
+#       contents: read
+#       id-token: write
 
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout Code
+#         uses: actions/checkout@v4
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.x.x
+#       - name: Setup Terraform
+#         uses: hashicorp/setup-terraform@v3
+#         with:
+#           terraform_version: 1.x.x
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+#       - name: Configure AWS Credentials
+#         uses: aws-actions/configure-aws-credentials@v4
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: us-east-1
 
-      - name: Terraform Init
-        id: init
-        run: terraform init # No need for -backend-config here as it's hardcoded in main.tf
-        env:
-          AWS_REGION: us-east-1 # Still good to set region consistently
+#       - name: Terraform Init
+#         id: init
+#         run: terraform init # No need for -backend-config here as it's hardcoded in main.tf
+#         env:
+#           AWS_REGION: us-east-1 # Still good to set region consistently
 
-      - name: Terraform Format Check
-        id: fmt
-        run: terraform fmt -check
-        continue-on-error: true # Allow subsequent steps to run even if format fails
+#       - name: Terraform Format Check
+#         id: fmt
+#         run: terraform fmt -check
+#         continue-on-error: true # Allow subsequent steps to run even if format fails
 
-      - name: Terraform Validate
-        id: validate
-        run: terraform validate -no-color
+#       - name: Terraform Validate
+#         id: validate
+#         run: terraform validate -no-color
 
-      - name: Terraform Plan
-        id: plan
-        # Only run plan on pull requests OR if explicitly triggered via workflow_dispatch
-        # This provides a preview of changes before merging to main, or for manual checks.
-        if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
-        run: terraform plan -no-color -input=false
-        # `-input=false` prevents Terraform from prompting for input variables.
+#       - name: Terraform Plan
+#         id: plan
+#         # Only run plan on pull requests OR if explicitly triggered via workflow_dispatch
+#         # This provides a preview of changes before merging to main, or for manual checks.
+#         if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+#         run: terraform plan -no-color -input=false
+#         # `-input=false` prevents Terraform from prompting for input variables.
 
-      - name: Terraform Apply
-        id: apply
-        # Only apply on push to the 'main' branch.
-        # This is the "deployment" step. Use with caution for production environments.
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: terraform apply -auto-approve -input=false
+#       - name: Terraform Apply
+#         id: apply
+#         # Only apply on push to the 'main' branch.
+#         # This is the "deployment" step. Use with caution for production environments.
+#         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+#         run: terraform apply -auto-approve -input=false
         # `-auto-approve` automatically applies the plan.
         # For production, consider using manual approval via GitHub Environments or separate jobs.
 

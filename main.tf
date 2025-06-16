@@ -3,15 +3,16 @@ terraform {
     aws = {
       source  = "hashicorp/aws"
       version = "~> 5.0"
+      profile = "SECUREIQ" # Specify the AWS profile to use}
     }
   }
 
   # This block configures the backend for storing the Terraform state.
   # Uncomment and configure the backend block below if you want to use S3 for state management.
   backend "s3" {
-    bucket       = "udbhas-terraform-state-20250607"
+    bucket       = "multivendor-project-terraform-state-20250607"
     key          = "MULTIVENDOR-PROJECT/terraform.tfstate"
-    region       = "us-east-1"
+    region       = "ap-south-1" # Specify the AWS region where the S3 bucket is located
     use_lockfile = true
   }
 }

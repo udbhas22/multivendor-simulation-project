@@ -1,7 +1,7 @@
 variable "region" {
   description = "value of the region where the resources will be created"
   type        = string
-  default     = "us-east-1"
+  default     = "ap-south-1" # Specify the AWS region where the resources will be created
 }
 
 variable "common_tags" {
@@ -29,7 +29,7 @@ variable "vpc_cidr" {
 variable "availability_zone" {
   description = "availability zones in the region"
   type        = string
-  default     = "us-east-1a"
+  default     = "ap-south-1a" # Specify the availability zone where the resources will be created
 }
 
 # Subnet Variables
