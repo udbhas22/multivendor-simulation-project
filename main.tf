@@ -123,7 +123,7 @@ data "aws_ami" "ubuntu_noble" {
   most_recent = false            
   filter {
     name   = "image-id"
-    values = ["ami-020cba7c55df1f615"] 
+    values = ["ami-0d1b5a8c13042c939"] 
   }
 }
 # Instance creation for Ubuntu VMs with multiple ENIs
@@ -131,7 +131,7 @@ resource "aws_instance" "ubuntu_victim_instances" {
   for_each      = var.instance_configs # Iterate over instance configurations
   ami           = data.aws_ami.ubuntu_noble.id
   instance_type = each.value.instance_type
-  key_name      = var.key_pair_name
+  key_name      = var.sshkey_name
 
   # Attach network interfaces dynamically based on instance config
   dynamic "network_interface" {
@@ -149,4 +149,53 @@ resource "aws_instance" "ubuntu_victim_instances" {
     Name   = each.key          # The instance's specific name
     Vendor = each.value.vendor # gets the vendor name from the instance config
   })
+}
+
+# Creating eip for management instance
+resource "aws_eip" "management_eip" {
+  domain = "vpc"
+  tags = merge(var.common_tags, {
+    Name = "MANAGEMENT-UBUNTU-EIP"
+  })
+}
+
+# eip association for management instance
+resource "aws_eip_association" "management_eip_association" {
+  #instance_id   = aws_instance.ubuntu_victim_instances["MANAGEMENT-UBUNTU-PRIMARY"].id
+  network_interface_id = aws_network_interface.multi_interfaces["MANAGEMENT-UBUNTU-MGMT-ENI"].id
+  allocation_id = aws_eip.management_eip.id
+  allow_reassociation = true
+
+}
+
+# Cration of internet gateway
+resource "aws_internet_gateway" "my_igw" {
+  vpc_id = aws_vpc.my_vpc.id
+
+  tags = merge(var.common_tags, {
+    Name = "MULTIVENDOR-IGW"
+  })
+}
+# Key Pair for SSH access
+resource "tls_private_key" "ssh_key" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+  
+}
+resource "aws_key_pair" "mykey" {
+  key_name   = var.sshkey_name
+  public_key = tls_private_key.ssh_key.public_key_openssh
+  tags = merge(var.common_tags, {
+    Name = var.sshkey_name
+    Vendor = "ALL"
+  })
+}
+#Output for the SSH Key Pair 
+output "private_key_pem" {
+  value     = tls_private_key.ssh_key.private_key_pem
+  sensitive = true
+}
+
+output "save_private_key_to_file" {
+  value = "Run this command to save the key: \nterraform output -raw private_key_pem > mykey.pem && chmod 400 mykey.pem"
 }

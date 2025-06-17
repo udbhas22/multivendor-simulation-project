@@ -1,7 +1,7 @@
 variable "region" {
   description = "value of the region where the resources will be created"
   type        = string
-  default     = "ap-south-1" # Specify the AWS region where the resources will be created
+  default     = "us-east-2" # Specify the AWS region where the resources will be created
 }
 
 variable "common_tags" {
@@ -29,7 +29,7 @@ variable "vpc_cidr" {
 variable "availability_zone" {
   description = "availability zones in the region"
   type        = string
-  default     = "ap-south-1a" # Specify the availability zone where the resources will be created
+  default     = "us-east-2a" # Specify the availability zone where the resources will be created
 }
 
 # Subnet Variables
@@ -151,14 +151,21 @@ variable "network_interface_configs" {
       is_primary        = false
       vendor            = "VENDOR3"
     }
+
+    "MANAGEMENT-UBUNTU-PRIMARY-ENI" = {
+      subnet_key        = "MANAGEMENT-SUBNET"
+      private_ip_suffix = 20
+      is_primary        = true
+      vendor            = "ALL"
+    },
   }
 }
 
 # New variable for your SSH Key Pair
-variable "key_pair_name" {
+variable "sshkey_name" {
   description = "The name of the EC2 Key Pair to allow SSH access."
   type        = string
-  default     = "Key-projectLab" #Created manually in AWS console
+  default     = "MULTIVENDOR-KEY-FOR-ALL" #Created manually in AWS console
 }
 # New variable for instance configurations
 variable "instance_configs" {
