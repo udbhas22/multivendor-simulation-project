@@ -3,7 +3,7 @@ terraform {
     aws = {
       source  = "hashicorp/aws"
       version = "~> 5.0"
-      profile = "SECUREIQ" # Specify the AWS profile to use}
+      #profile = "SECUREIQ" # Specify the AWS profile to use}
     }
   }
 
@@ -162,7 +162,7 @@ resource "aws_eip" "management_eip" {
 # eip association for management instance
 resource "aws_eip_association" "management_eip_association" {
   #instance_id   = aws_instance.ubuntu_victim_instances["MANAGEMENT-UBUNTU-PRIMARY"].id
-  network_interface_id = aws_network_interface.multi_interfaces["MANAGEMENT-UBUNTU-MGMT-ENI"].id
+  network_interface_id = aws_network_interface.multi_interfaces["MANAGEMENT-UBUNTU-PRIMARY-ENI"].id
   allocation_id = aws_eip.management_eip.id
   allow_reassociation = true
 
@@ -175,6 +175,30 @@ resource "aws_internet_gateway" "my_igw" {
   tags = merge(var.common_tags, {
     Name = "MULTIVENDOR-IGW"
   })
+}
+
+# --- Route Table and Association for Management Subnet ---
+
+# Create a custom route table for the management subnet
+resource "aws_route_table" "management_route_table" {
+  vpc_id = aws_vpc.my_vpc.id
+
+  tags = merge(var.common_tags, {
+    Name = "MANAGEMENT-ROUTE-TABLE"
+  })
+}
+
+# Add a default route (0.0.0.0/0) to the Internet Gateway in the management route table
+resource "aws_route" "management_internet_route" {
+  route_table_id         = aws_route_table.management_route_table.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.my_igw.id
+}
+
+# Associate the MANAGEMENT-SUBNET with the new management route table
+resource "aws_route_table_association" "management_subnet_association" {
+  subnet_id      = aws_subnet.all_subnets["MANAGEMENT-SUBNET"].id
+  route_table_id = aws_route_table.management_route_table.id
 }
 # Key Pair for SSH access
 resource "tls_private_key" "ssh_key" {
@@ -191,11 +215,18 @@ resource "aws_key_pair" "mykey" {
   })
 }
 #Output for the SSH Key Pair 
-output "private_key_pem" {
-  value     = tls_private_key.ssh_key.private_key_pem
-  sensitive = true
+# output "private_key_pem" {
+#   value     = tls_private_key.ssh_key.private_key_pem
+#   sensitive = true
+# }
+
+# output "save_private_key_to_file" {
+#   value = "Run this command to save the key: \nterraform output -raw private_key_pem > mykey.pem && chmod 400 mykey.pem"
+# }
+
+resource "local_file" "ssh_key_file" { 
+  content  = tls_private_key.ssh_key.private_key_pem
+  filename = "${path.module}/mykey.pem"
+  file_permission = "0400" # Set file permissions to read-only for the owner
 }
 
-output "save_private_key_to_file" {
-  value = "Run this command to save the key: \nterraform output -raw private_key_pem > mykey.pem && chmod 400 mykey.pem"
-}

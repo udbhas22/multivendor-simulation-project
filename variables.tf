@@ -191,5 +191,10 @@ variable "instance_configs" {
       vendor                  = "VENDOR3"
       network_interfaces_keys = ["VENDOR3-VICTIM-UBUNTU-PRIMARY-ENI", "VENDOR3-VICTIM-UBUNTU-MGMT-ENI"]
     }
+    "MANAGEMENT-UBUNTU" = {
+      instance_type           = "t2.micro"
+      vendor                  = "ALL"
+      network_interfaces_keys = ["MANAGEMENT-UBUNTU-PRIMARY-ENI"]
+    }
   }
 }
